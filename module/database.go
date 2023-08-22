@@ -53,6 +53,7 @@ func (d *Database) SaveFIOResult(result Result, workload WorkLoad, disksmart Dis
 		log.Fatal(err)
 	}
 	currentTime := time.Now().In(loc)
+	fmt.Println("current time: ", currentTime)
 
 	if count > 0 {
 		// 如果存在相同组合，则执行更新操作
