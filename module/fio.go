@@ -104,7 +104,7 @@ func ParseFIOOutput(output []byte) (Result, error) {
 	clatAvgUnitMatches := clatAvgUnitRegex.FindStringSubmatch(outputStr)
 
 	// 提取 Clat 平均值
-	clatAvgPattern := `clat\s+avg=([\d.]+)`
+	clatAvgPattern := `clat.+avg=([\d.]+)`
 	clatAvgRegex := regexp.MustCompile(clatAvgPattern)
 	clatAvgMatches := clatAvgRegex.FindStringSubmatch(outputStr)
 	if len(clatAvgMatches) > 1 && len(clatAvgUnitMatches) > 1 {
