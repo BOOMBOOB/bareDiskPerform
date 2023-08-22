@@ -48,7 +48,7 @@ func (d *Database) SaveFIOResult(result Result, workload WorkLoad, disksmart Dis
 	}
 
 	// 获取东八区本地时间
-	loc, err := time.LoadLocation("CST")
+	loc, err := time.LoadLocation("Asia/Shanghai")
 	if err != nil {
 		log.Fatal(err)
 	}
