@@ -60,12 +60,13 @@ func ExecuteFio(device string, iotype string, iodepth int) ([]byte, WorkLoad, er
 		"-groups_reporting",
 		"-name=job",
 	}
+	fmt.Println("args: ", args)
 	cmd := exec.Command("fio", args...)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		fmt.Println("output: ", output)
 		fmt.Println("err: ", err)
-		log.Fatal(err)
+		//log.Fatal(err)
 	}
 	return output, workload, nil
 }
