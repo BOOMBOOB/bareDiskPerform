@@ -9,6 +9,7 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"log"
 	"time"
 )
 
@@ -46,17 +47,24 @@ func (d *Database) SaveFIOResult(result Result, workload WorkLoad, disksmart Dis
 		return err
 	}
 
+	// 获取东八区本地时间
+	loc, err := time.LoadLocation("CST")
+	if err != nil {
+		log.Fatal(err)
+	}
+	currentTime := time.Now().In(loc)
+
 	if count > 0 {
 		// 如果存在相同组合，则执行更新操作
 		_, err = d.db.Exec("UPDATE bareTest SET IOPS = ?, BandWidth = ?, ClatAvg = ?, Clat95 = ?, Clat99 = ?, SMART = ?, timestamp = ? WHERE SerialNumber = ? AND BlockSize = ? AND IODepth = ? AND IOType = ?",
-			result.Iops, result.BandWidth, result.ClatAvg, result.Clat95, result.Clat99, disksmart.SMART, time.Now(), disksmart.SerialNumber, workload.BlockSize, workload.IODepth, workload.IOType)
+			result.Iops, result.BandWidth, result.ClatAvg, result.Clat95, result.Clat99, disksmart.SMART, currentTime, disksmart.SerialNumber, workload.BlockSize, workload.IODepth, workload.IOType)
 		if err != nil {
 			return err
 		}
 	} else {
 		// 如果不存在相同组合，则执行插入操作
 		_, err = d.db.Exec("INSERT INTO bareTest (SerialNumber, BlockSize, IODepth, IOType, IOPS, BandWidth, ClatAvg, Clat95, Clat99, SMART, Model, UserCapacity, RotationRate, FormFactor, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-			disksmart.SerialNumber, workload.BlockSize, workload.IODepth, workload.IOType, result.Iops, result.BandWidth, result.ClatAvg, result.Clat95, result.Clat99, disksmart.SMART, disksmart.DeviceModel, disksmart.UserCapacity, disksmart.RotationRate, disksmart.FormFactor, time.Now())
+			disksmart.SerialNumber, workload.BlockSize, workload.IODepth, workload.IOType, result.Iops, result.BandWidth, result.ClatAvg, result.Clat95, result.Clat99, disksmart.SMART, disksmart.DeviceModel, disksmart.UserCapacity, disksmart.RotationRate, disksmart.FormFactor, currentTime)
 		if err != nil {
 			return err
 		}
