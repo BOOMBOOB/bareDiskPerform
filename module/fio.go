@@ -57,7 +57,7 @@ func ExecuteFio(device string, iotype string, iodepth int) ([]byte, WorkLoad, er
 		"-time_based",
 		"-runtime=120",
 		"-ramp_time=20",
-		"-groups_reporting",
+		"-group_reporting",
 		"-name=job",
 	}
 	fmt.Println("args: ", args)
