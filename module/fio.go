@@ -99,28 +99,40 @@ func ParseFIOOutput(output []byte) (Result, error) {
 		}
 	}
 
+	// 提取 Clat 平均值单位
+	clatAvgUnitPattern := `clat\s*\((\w+)\)`
+	clatAvgUnitRegex := regexp.MustCompile(clatAvgUnitPattern)
+	clatAvgUnitMatches := clatAvgUnitRegex.FindStringSubmatch(outputStr)
+
 	// 提取 Clat 平均值
 	clatAvgPattern := `clat\s+avg=\s*(\S+)`
 	clatAvgRegex := regexp.MustCompile(clatAvgPattern)
 	clatAvgMatches := clatAvgRegex.FindStringSubmatch(outputStr)
-	if len(clatAvgMatches) >= 2 {
-		result.ClatAvg = clatAvgMatches[1]
+	if len(clatAvgMatches) > 1 && len(clatAvgUnitMatches) > 1 {
+		result.ClatAvg = clatAvgMatches[1] + clatAvgUnitMatches[1]
 	}
 
-	// 提取 Clat 95th 百分位
-	clat95Pattern := `clat\s+95th=\s*(\S+)`
-	clat95Regex := regexp.MustCompile(clat95Pattern)
-	clat95Matches := clat95Regex.FindStringSubmatch(outputStr)
-	if len(clat95Matches) >= 2 {
-		result.Clat95 = clat95Matches[1]
-	}
+	// 提取 Clat percentiles 单位
+	clatPercentilesUnitPattern := `clat percentiles \((.+)\)`
+	clatPercentilesUnitRegex := regexp.MustCompile(clatPercentilesUnitPattern)
+	clatPercentilesUnitMatches := clatPercentilesUnitRegex.FindStringSubmatch(outputStr)
+	if len(clatPercentilesUnitMatches) > 1 {
 
-	// 提取 Clat 99th 百分位
-	clat99Pattern := `clat\s+99th=\s*(\S+)`
-	clat99Regex := regexp.MustCompile(clat99Pattern)
-	clat99Matches := clat99Regex.FindStringSubmatch(outputStr)
-	if len(clat99Matches) >= 2 {
-		result.Clat99 = clat99Matches[1]
+		// 提取 Clat 95th 百分位
+		clat95Pattern := `95\.00th=\[\s*(\d+)\]`
+		clat95Regex := regexp.MustCompile(clat95Pattern)
+		clat95Matches := clat95Regex.FindStringSubmatch(outputStr)
+		if len(clat95Matches) > 1 {
+			result.Clat95 = clat95Matches[1] + clatPercentilesUnitMatches[1]
+		}
+
+		// 提取 Clat 99th 百分位
+		clat99Pattern := `99\.00th=\[\s*(\d+)\]`
+		clat99Regex := regexp.MustCompile(clat99Pattern)
+		clat99Matches := clat99Regex.FindStringSubmatch(outputStr)
+		if len(clat99Matches) > 1 {
+			result.Clat99 = clat99Matches[1] + clatPercentilesUnitMatches[1]
+		}
 	}
 
 	return result, nil
