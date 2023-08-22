@@ -6,6 +6,7 @@
 package module
 
 import (
+	"fmt"
 	"log"
 	"os/exec"
 	"regexp"
@@ -25,9 +26,10 @@ func GetDiskSmartInfo(device string) (DiskSmart, error) {
 	if !strings.HasPrefix(device, "/dev/") {
 		device = "/dev/" + device
 	}
+	fmt.Printf("获取设备 %v 的smart信息", device)
 	cmd := exec.Command("smartctl", "-a", device)
 
-	output, err := cmd.Output()
+	output, err := cmd.CombinedOutput()
 	if err != nil {
 		log.Fatal(err)
 	}
