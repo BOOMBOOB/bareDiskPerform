@@ -1,0 +1,14 @@
+{
+  "mysql": {
+    "server": "127.0.0.1",
+    "port": "3306",
+    "database": "disk",
+    "username": "root",
+    "password": "123456"
+  },
+  "disks": {
+    "mode": "auto",
+    "type": ["sequential", "random"],
+    "devices": ["sdc", "sdd", "sde", "sdf"]
+  }
+}
