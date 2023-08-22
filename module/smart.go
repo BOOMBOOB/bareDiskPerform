@@ -7,7 +7,6 @@ package module
 
 import (
 	"fmt"
-	"log"
 	"os/exec"
 	"regexp"
 	"strings"
@@ -31,9 +30,7 @@ func GetDiskSmartInfo(device string) (DiskSmart, error) {
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		fmt.Println("output: ", string(output))
 		fmt.Println("err: ", err)
-		log.Fatal(err)
 	}
 
 	// 将输出结果转换为字符串
