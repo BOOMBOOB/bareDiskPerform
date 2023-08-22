@@ -6,6 +6,7 @@
 package module
 
 import (
+	"fmt"
 	"log"
 	"os/exec"
 	"regexp"
@@ -62,6 +63,8 @@ func ExecuteFio(device string, iotype string, iodepth int) ([]byte, WorkLoad, er
 	cmd := exec.Command("fio", args...)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
+		fmt.Println("output: ", output)
+		fmt.Println("err: ", err)
 		log.Fatal(err)
 	}
 	return output, workload, nil
