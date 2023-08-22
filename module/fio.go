@@ -55,8 +55,8 @@ func ExecuteFio(device string, iotype string, iodepth int) ([]byte, WorkLoad, er
 		"-sync=1",
 		"-direct=1",
 		"-time_based",
-		"-runtime=120",
-		"-ramp_time=20",
+		"-runtime=20",
+		"-ramp_time=10",
 		"-group_reporting",
 		"-name=job",
 	}

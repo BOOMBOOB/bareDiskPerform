@@ -31,6 +31,7 @@ func main() {
 		if err := db.Close(); err != nil {
 			fmt.Println("failed to close database connection: ", err)
 		}
+		fmt.Println("close database connection successfully")
 	}()
 
 	disks := config.Disks.Devices
