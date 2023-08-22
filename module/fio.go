@@ -43,7 +43,7 @@ func ExecuteFio(device string, iotype string, config Config) ([]byte, WorkLoad, 
 
 	iodepth, err := strconv.Atoi(config.Iodepth)
 	if err != nil {
-		fmt.Println("将配置中iodepth转为字符串失败")
+		fmt.Println("将配置中iodepth转为int失败")
 	}
 	rampTime := config.RampTime
 	runTime := config.Runtime
