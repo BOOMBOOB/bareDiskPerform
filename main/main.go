@@ -35,6 +35,8 @@ func main() {
 
 	disks := config.Disks.Devices
 	iotypes := config.Disks.Type
+	fmt.Println("disks: ", disks)
+	fmt.Println("iotypes: ", iotypes)
 	// 遍历配置文件中指定的盘符列表
 	for _, disk := range disks {
 		// 获取磁盘smart信息
