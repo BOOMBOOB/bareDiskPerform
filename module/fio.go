@@ -60,7 +60,6 @@ func ExecuteFio(device string, iotype string, iodepth int) ([]byte, WorkLoad, er
 		"-group_reporting",
 		"-name=job",
 	}
-	fmt.Println("args: ", args)
 	cmd := exec.Command("fio", args...)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
@@ -105,7 +104,7 @@ func ParseFIOOutput(output []byte) (Result, error) {
 	clatAvgUnitMatches := clatAvgUnitRegex.FindStringSubmatch(outputStr)
 
 	// 提取 Clat 平均值
-	clatAvgPattern := `clat\s+avg=\s*(\S+)`
+	clatAvgPattern := `clat\s+avg=([\d.]+)`
 	clatAvgRegex := regexp.MustCompile(clatAvgPattern)
 	clatAvgMatches := clatAvgRegex.FindStringSubmatch(outputStr)
 	if len(clatAvgMatches) > 1 && len(clatAvgUnitMatches) > 1 {
