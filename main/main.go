@@ -38,7 +38,7 @@ func main() {
 	// 遍历配置文件中指定的盘符列表
 	for _, disk := range disks {
 		// 获取磁盘smart信息
-		fmt.Printf("获取磁盘 %v smart信息....", disk)
+		fmt.Printf("获取磁盘 %v smart信息....\n", disk)
 		smartInfo, err := module.GetDiskSmartInfo(disk)
 		if err != nil {
 			log.Fatal(err)
@@ -47,7 +47,7 @@ func main() {
 
 		// 遍历配置文件中指定的测试类型
 		for _, iotype := range iotypes {
-			fmt.Printf("对磁盘 %v 进行 %v 负载测试....", disk, iotype)
+			fmt.Printf("对磁盘 %v 进行 %v 负载测试....\n", disk, iotype)
 			fiooutput, workload, err := module.ExecuteFio(disk, iotype, 128)
 			if err != nil {
 				log.Fatal(err)

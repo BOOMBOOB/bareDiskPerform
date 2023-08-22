@@ -26,11 +26,13 @@ func GetDiskSmartInfo(device string) (DiskSmart, error) {
 	if !strings.HasPrefix(device, "/dev/") {
 		device = "/dev/" + device
 	}
-	fmt.Printf("获取设备 %v 的smart信息", device)
+	fmt.Printf("获取设备 %v 的smart信息\n", device)
 	cmd := exec.Command("smartctl", "-a", device)
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
+		fmt.Println("output: ", string(output))
+		fmt.Println("err: ", err)
 		log.Fatal(err)
 	}
 
