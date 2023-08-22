@@ -11,8 +11,11 @@ import (
 )
 
 type Config struct {
-	Mysql MysqlConfig `json:"mysql"`
-	Disks DisksConfig `json:"disks"`
+	Mysql    MysqlConfig `json:"mysql"`
+	Disks    DisksConfig `json:"disks"`
+	RampTime string      `json:"ramp_time"`
+	Runtime  string      `json:"runtime"`
+	Iodepth  string      `json:"iodepth"`
 }
 
 type MysqlConfig struct {

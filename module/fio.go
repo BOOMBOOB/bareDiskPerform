@@ -28,7 +28,7 @@ type WorkLoad struct {
 	IOType    string
 }
 
-func ExecuteFio(device string, iotype string, iodepth int) ([]byte, WorkLoad, error) {
+func ExecuteFio(device string, iotype string, config Config) ([]byte, WorkLoad, error) {
 	if !strings.HasSuffix(device, "/dev/") {
 		device = "/dev/" + device
 	}
@@ -40,6 +40,13 @@ func ExecuteFio(device string, iotype string, iodepth int) ([]byte, WorkLoad, er
 	} else {
 		log.Fatal("unknown iotype")
 	}
+
+	iodepth, err := strconv.Atoi(config.Iodepth)
+	if err != nil {
+		fmt.Println("将配置中iodepth转为字符串失败")
+	}
+	rampTime := config.RampTime
+	runTime := config.Runtime
 
 	workload := WorkLoad{}
 	workload.BlockSize = bs
@@ -55,8 +62,8 @@ func ExecuteFio(device string, iotype string, iodepth int) ([]byte, WorkLoad, er
 		"-sync=1",
 		"-direct=1",
 		"-time_based",
-		"-runtime=20",
-		"-ramp_time=10",
+		"-runtime=" + runTime,
+		"-ramp_time=" + rampTime,
 		"-group_reporting",
 		"-name=job",
 	}

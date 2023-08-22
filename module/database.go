@@ -37,7 +37,6 @@ func (d *Database) Close() error {
 }
 
 func (d *Database) SaveFIOResult(result Result, workload WorkLoad, disksmart DiskSmart) error {
-	fmt.Println("insert data: ", result.ClatAvg, result.Clat95, result.Clat99, disksmart.DeviceModel, disksmart.UserCapacity, disksmart.RotationRate, disksmart.FormFactor, time.Now())
 	// 查询数据库表中是否存在相同的 SerialNumber、BlockSize、IODepth 和 IOType 组合
 	row := d.db.QueryRow("SELECT COUNT(*) FROM bareTest WHERE SerialNumber = ? AND BlockSize = ? AND IODepth = ? AND IOType = ?",
 		disksmart.SerialNumber, workload.BlockSize, workload.IODepth, workload.IOType)
