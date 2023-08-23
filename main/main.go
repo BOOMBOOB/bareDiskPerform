@@ -35,6 +35,13 @@ func main() {
 	}()
 
 	disks := config.Disks.Devices
+	if config.Disks.Mode == "auto" {
+		disks, err = module.GetAutoScanDisks()
+		if err != nil {
+			log.Fatalf("auto get disks failed: %v", err)
+		}
+	}
+
 	iotypes := config.Disks.Type
 
 	// 遍历配置文件中指定的盘符列表
