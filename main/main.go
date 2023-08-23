@@ -7,38 +7,40 @@ package main
 
 import (
 	"bare-disk-perform/module"
-	"fmt"
-	"log"
 )
 
 func main() {
-	fmt.Println("加载配置文件....")
+
+	// 初始化日志
+	logger := module.NewMyLogger()
+
+	logger.Infof("load config file....")
 	config, err := module.LoadConfig("./config.json")
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatalf("load config file failed: %v", err)
 	}
-	fmt.Println("配置文件加载成功.")
+	logger.Infof("load config file success.")
 
 	// 获取db 连接
-	fmt.Println("获取 db 连接....")
+	logger.Infof("get db connection....")
 	db, err := module.NewDatabase(config)
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatalf("get db connection failed: %v", err)
 	}
-	fmt.Println("获取 db 连接成功.")
+	logger.Infof("get db connection success.")
 
 	defer func() {
 		if err := db.Close(); err != nil {
-			fmt.Println("failed to close database connection: ", err)
+			logger.Infof("failed to close database connection: ", err)
 		}
-		fmt.Println("close database connection successfully")
+		logger.Infof("close database connection successfully")
 	}()
 
 	disks := config.Disks.Devices
 	if config.Disks.Mode == "auto" {
 		disks, err = module.GetAutoScanDisks()
 		if err != nil {
-			log.Fatalf("auto get disks failed: %v", err)
+			logger.Fatalf("auto get disks failed: %v", err)
 		}
 	}
 
@@ -47,37 +49,37 @@ func main() {
 	// 遍历配置文件中指定的盘符列表
 	for _, disk := range disks {
 		// 获取磁盘smart信息
-		fmt.Printf("获取磁盘 %v smart信息....\n", disk)
+		logger.Infof("get disk %v smart info....\n", disk)
 		smartInfo, err := module.GetDiskSmartInfo(disk)
 		if err != nil {
-			log.Fatal(err)
+			logger.Fatalf("get disk smart info failed: %v", err)
 		}
-		fmt.Println("获取磁盘smart信息成功")
+		logger.Infof("get disk smart info success")
 
 		// 遍历配置文件中指定的测试类型
 		for _, iotype := range iotypes {
-			fmt.Printf("对磁盘 %v 进行 %v 负载测试....\n", disk, iotype)
+			logger.Infof("perform disk %v load %v testing....\n", disk, iotype)
 			fiooutput, workload, err := module.ExecuteFio(disk, iotype, config)
 			if err != nil {
-				log.Fatal(err)
+				logger.Fatalf("execute load testing failed: %v", err)
 			}
-			fmt.Println("负载测试完毕.")
+			logger.Infof("load testing success.")
 
 			// 解析 fio 执行结果
-			fmt.Println("分析 fio 测试结果....")
+			logger.Infof("analyse fio test result....")
 			ioResult, err := module.ParseFIOOutput(fiooutput)
 			if err != nil {
-				log.Fatal(err)
+				logger.Fatalf("parse test result failed: ", err)
 			}
-			fmt.Println("fio测试结果分析完毕.")
+			logger.Infof("fio test result analyze success.")
 
 			// 记录存储到数据库中
-			fmt.Println("记录测试结果到数据库中....")
+			logger.Infof("save test result into mysql database....")
 			err = db.SaveFIOResult(ioResult, workload, smartInfo)
 			if err != nil {
-				log.Fatal(err)
+				logger.Fatalf("save test result failed: ", err)
 			}
-			fmt.Println("记录完毕.")
+			logger.Infof("save test result success.")
 		}
 	}
 }
