@@ -12,7 +12,8 @@ import (
 func main() {
 
 	// 初始化日志
-	logger := module.NewMyLogger()
+	module.InitMyLogger()
+	logger := module.GetLogger()
 
 	logger.Infof("load config file....")
 	config, err := module.LoadConfig("./config.json")
@@ -25,22 +26,22 @@ func main() {
 	logger.Infof("get db connection....")
 	db, err := module.NewDatabase(config)
 	if err != nil {
-		logger.Fatalf("get db connection failed: %v", err)
+		logger.Fatalf("get db connection failed: %v.", err)
 	}
 	logger.Infof("get db connection success.")
 
 	defer func() {
 		if err := db.Close(); err != nil {
-			logger.Infof("failed to close database connection: ", err)
+			logger.Infof("failed to close database connection: %v.", err)
 		}
-		logger.Infof("close database connection successfully")
+		logger.Infof("close database connection successfully.")
 	}()
 
 	disks := config.Disks.Devices
 	if config.Disks.Mode == "auto" {
 		disks, err = module.GetAutoScanDisks()
 		if err != nil {
-			logger.Fatalf("auto get disks failed: %v", err)
+			logger.Fatalf("auto get disks failed: %v.", err)
 		}
 	}
 
@@ -49,19 +50,19 @@ func main() {
 	// 遍历配置文件中指定的盘符列表
 	for _, disk := range disks {
 		// 获取磁盘smart信息
-		logger.Infof("get disk %v smart info....\n", disk)
+		logger.Infof("get disk %v smart info....", disk)
 		smartInfo, err := module.GetDiskSmartInfo(disk)
 		if err != nil {
-			logger.Fatalf("get disk smart info failed: %v", err)
+			logger.Fatalf("get disk smart info failed: %v.", err)
 		}
-		logger.Infof("get disk smart info success")
+		logger.Infof("get disk smart info successfully.")
 
 		// 遍历配置文件中指定的测试类型
 		for _, iotype := range iotypes {
-			logger.Infof("perform disk %v load %v testing....\n", disk, iotype)
+			logger.Infof("perform disk %v load %v testing....", disk, iotype)
 			fiooutput, workload, err := module.ExecuteFio(disk, iotype, config)
 			if err != nil {
-				logger.Fatalf("execute load testing failed: %v", err)
+				logger.Fatalf("execute load testing failed: %v.", err)
 			}
 			logger.Infof("load testing success.")
 
@@ -69,15 +70,15 @@ func main() {
 			logger.Infof("analyse fio test result....")
 			ioResult, err := module.ParseFIOOutput(fiooutput)
 			if err != nil {
-				logger.Fatalf("parse test result failed: ", err)
+				logger.Fatalf("parse test result failed: %v.", err)
 			}
-			logger.Infof("fio test result analyze success.")
+			logger.Infof("fio test result analyze successfully.")
 
 			// 记录存储到数据库中
 			logger.Infof("save test result into mysql database....")
 			err = db.SaveFIOResult(ioResult, workload, smartInfo)
 			if err != nil {
-				logger.Fatalf("save test result failed: ", err)
+				logger.Fatalf("save test result failed: %v.", err)
 			}
 			logger.Infof("save test result success.")
 		}

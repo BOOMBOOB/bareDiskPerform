@@ -37,13 +37,15 @@ func LoadConfig(filepath string) (Config, error) {
 
 	configData, err := os.ReadFile(filepath)
 	if err != nil {
+		logger.Errorf("Error reading.")
 		return config, err
 	}
 
 	err = json.Unmarshal(configData, &config)
 	if err != nil {
+		logger.Debugf("Error decoding config.")
 		return config, err
 	}
-
+	logger.Debugf("Config loaded successfully.")
 	return config, nil
 }

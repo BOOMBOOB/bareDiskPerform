@@ -15,8 +15,10 @@ type MyLogger struct {
 	logger *zap.Logger
 }
 
-func NewMyLogger() *MyLogger {
-	logger, _ := zap.Config{
+var logger *MyLogger
+
+func InitMyLogger() {
+	zapLogger, _ := zap.Config{
 		Encoding:         "console",
 		Level:            zap.NewAtomicLevelAt(zapcore.DebugLevel),
 		OutputPaths:      []string{"stdout"},
@@ -32,18 +34,27 @@ func NewMyLogger() *MyLogger {
 			EncodeLevel:    zapcore.CapitalColorLevelEncoder,
 			EncodeTime:     zapcore.ISO8601TimeEncoder,
 			EncodeDuration: zapcore.StringDurationEncoder,
-			EncodeCaller:   zapcore.ShortCallerEncoder,
+			EncodeCaller:   zapcore.FullCallerEncoder,
 		},
 	}.Build()
 
-	return &MyLogger{
-		logger: logger,
+	logger = &MyLogger{
+		logger: zapLogger,
 	}
+}
+
+func GetLogger() *MyLogger {
+	return logger
 }
 
 func (l *MyLogger) Infof(format string, args ...interface{}) {
 	message := fmt.Sprintf(format, args...)
 	l.logger.Info(message)
+}
+
+func (l *MyLogger) Debugf(format string, args ...interface{}) {
+	message := fmt.Sprintf(format, args...)
+	l.logger.Debug(message)
 }
 
 func (l *MyLogger) Warnf(format string, args ...interface{}) {

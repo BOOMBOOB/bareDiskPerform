@@ -7,7 +7,6 @@ package module
 
 import (
 	"fmt"
-	"log"
 	"os/exec"
 	"strings"
 )
@@ -24,8 +23,7 @@ func GetAutoScanDisks() ([]string, error) {
 	cmd := exec.Command("lsblk", args...)
 	output, err := cmd.Output()
 	if err != nil {
-		fmt.Println("get disks failed")
-		log.Fatal(err)
+		logger.Fatalf("auto get disks failed.")
 	}
 	outputLineStr := strings.Split(strings.TrimSpace(string(output)), "\n")
 	for _, line := range outputLineStr {
@@ -40,7 +38,7 @@ func GetAutoScanDisks() ([]string, error) {
 		smarctlCmd := exec.Command("smartctl", "-i", fmt.Sprintf("/dev/%s", diskName))
 		smartCtlOutput, err := smarctlCmd.Output()
 		if err != nil {
-			log.Printf("执行 smartctl 命令失败: %v", err)
+			logger.Errorf("执行 smartctl 命令失败: %v.", err)
 			continue
 		}
 		if strings.Contains(string(smartCtlOutput), "Rotation Rate") && !strings.Contains(string(smartCtlOutput), "Solid State Device") {
@@ -48,6 +46,6 @@ func GetAutoScanDisks() ([]string, error) {
 		}
 	}
 
-	fmt.Println("get disk list: ", disks)
+	logger.Debugf("get disk list: %v.", disks)
 	return disks, nil
 }

@@ -6,8 +6,6 @@
 package module
 
 import (
-	"fmt"
-	"log"
 	"os/exec"
 	"regexp"
 	"strconv"
@@ -38,16 +36,16 @@ func ExecuteFio(device string, iotype string, config Config) ([]byte, WorkLoad, 
 	} else if iotype == "randread" || iotype == "randwrite" {
 		bs = "4k"
 	} else {
-		log.Fatal("unknown iotype")
+		logger.Fatalf("unknown iotype.")
 	}
 
 	iodepth, err := strconv.Atoi(config.Iodepth)
 	if err != nil {
-		fmt.Println("将配置中iodepth转为int失败")
+		logger.Infof("translate iodepth string to int failed: %v.", err)
 	}
 	rampTime := config.RampTime
 	runTime := config.Runtime
-	fmt.Println("iodepth, ramptime, runtime: ", iodepth, rampTime, runTime)
+	logger.Infof("iodepth, ramptime, runtime: ", iodepth, rampTime, runTime)
 
 	workload := WorkLoad{}
 	workload.BlockSize = bs
@@ -71,10 +69,9 @@ func ExecuteFio(device string, iotype string, config Config) ([]byte, WorkLoad, 
 	cmd := exec.Command("fio", args...)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		fmt.Println("output: ", output)
-		fmt.Println("err: ", err)
-		//log.Fatal(err)
+		logger.Errorf("Failed to execute command: %v.", err)
 	}
+	logger.Debugf("execute command successfully.")
 	return output, workload, nil
 }
 
@@ -88,10 +85,13 @@ func ParseFIOOutput(output []byte) (Result, error) {
 	iopsPattern := `IOPS=\s*(\d+)`
 	iopsRegex := regexp.MustCompile(iopsPattern)
 	iopsMatches := iopsRegex.FindStringSubmatch(outputStr)
-	if len(iopsMatches) >= 2 {
+	if len(iopsMatches) > 1 {
 		iops, err := strconv.Atoi(iopsMatches[1])
 		if err == nil {
+			logger.Debugf("iops match result: %d.", iops)
 			result.Iops = iops
+		} else {
+			logger.Errorf("iops not found.")
 		}
 	}
 
@@ -99,10 +99,13 @@ func ParseFIOOutput(output []byte) (Result, error) {
 	bandwidthPattern := `BW=\s*(\d+)`
 	bandwidthRegex := regexp.MustCompile(bandwidthPattern)
 	bandwidthMatches := bandwidthRegex.FindStringSubmatch(outputStr)
-	if len(bandwidthMatches) >= 2 {
+	if len(bandwidthMatches) > 1 {
 		bandwidth, err := strconv.Atoi(bandwidthMatches[1])
 		if err == nil {
+			logger.Debugf("bandwidth match result: %d.", bandwidth)
 			result.BandWidth = bandwidth
+		} else {
+			logger.Errorf("bandwidth nut found.")
 		}
 	}
 
@@ -116,7 +119,10 @@ func ParseFIOOutput(output []byte) (Result, error) {
 	clatAvgRegex := regexp.MustCompile(clatAvgPattern)
 	clatAvgMatches := clatAvgRegex.FindStringSubmatch(outputStr)
 	if len(clatAvgMatches) > 1 && len(clatAvgUnitMatches) > 1 {
+		logger.Debugf("clat avg match result: %s %s.", clatAvgMatches[1], clatAvgUnitMatches[1])
 		result.ClatAvg = clatAvgMatches[1] + clatAvgUnitMatches[1]
+	} else {
+		logger.Errorf("clat avg not found.")
 	}
 
 	// 提取 Clat percentiles 单位
@@ -130,7 +136,10 @@ func ParseFIOOutput(output []byte) (Result, error) {
 		clat95Regex := regexp.MustCompile(clat95Pattern)
 		clat95Matches := clat95Regex.FindStringSubmatch(outputStr)
 		if len(clat95Matches) > 1 {
+			logger.Debugf("Clat 95 match result: %s %s.", clat95Matches[1], clatPercentilesUnitMatches[1])
 			result.Clat95 = clat95Matches[1] + clatPercentilesUnitMatches[1]
+		} else {
+			logger.Errorf("clat 95 not found.")
 		}
 
 		// 提取 Clat 99th 百分位
@@ -138,7 +147,10 @@ func ParseFIOOutput(output []byte) (Result, error) {
 		clat99Regex := regexp.MustCompile(clat99Pattern)
 		clat99Matches := clat99Regex.FindStringSubmatch(outputStr)
 		if len(clat99Matches) > 1 {
+			logger.Debugf("Clat 99 match result: %s %s.", clat99Matches[1], clatPercentilesUnitMatches[1])
 			result.Clat99 = clat99Matches[1] + clatPercentilesUnitMatches[1]
+		} else {
+			logger.Errorf("clat 99 not found.")
 		}
 	}
 
