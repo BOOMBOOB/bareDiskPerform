@@ -52,7 +52,8 @@ func (d *Database) SaveFIOResult(result Result, workload WorkLoad, disksmart Dis
 	if err != nil {
 		log.Fatal(err)
 	}
-	currentTime := time.Now().In(loc)
+	current := time.Now().In(loc)
+	currentTime := current.Format("2006-01-02T15:04:05")
 	fmt.Println("current time: ", currentTime)
 
 	if count > 0 {
