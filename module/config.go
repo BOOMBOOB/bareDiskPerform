@@ -7,12 +7,14 @@ package module
 
 import (
 	"encoding/json"
+	"log"
 	"os"
 )
 
 type Config struct {
 	Mysql    MysqlConfig `json:"mysql"`
 	Disks    DisksConfig `json:"disks"`
+	Level    string      `json:"level"`
 	RampTime string      `json:"ramp_time"`
 	Runtime  string      `json:"runtime"`
 	Iodepth  string      `json:"iodepth"`
@@ -37,15 +39,15 @@ func LoadConfig(filepath string) (Config, error) {
 
 	configData, err := os.ReadFile(filepath)
 	if err != nil {
-		logger.Errorf("Error reading.")
+		log.Println("Error reading.")
 		return config, err
 	}
 
 	err = json.Unmarshal(configData, &config)
 	if err != nil {
-		logger.Debugf("Error decoding config.")
+		log.Println("Error decoding config.")
 		return config, err
 	}
-	logger.Debugf("Config loaded successfully.")
+	log.Println("Config loaded successfully.")
 	return config, nil
 }

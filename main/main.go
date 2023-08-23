@@ -7,20 +7,36 @@ package main
 
 import (
 	"bare-disk-perform/module"
+	"log"
+	"strings"
 )
 
 func main() {
 
-	// 初始化日志
-	module.InitMyLogger()
-	logger := module.GetLogger()
-
-	logger.Infof("load config file....")
+	log.Println("load config file....")
 	config, err := module.LoadConfig("./config.json")
 	if err != nil {
-		logger.Fatalf("load config file failed: %v", err)
+		log.Fatalf("load config file failed: %v", err)
 	}
-	logger.Infof("load config file success.")
+	log.Println("load config file success.")
+
+	// 获取配置中的日志等级
+	level := strings.ToLower(config.Level)
+	validLevels := []string{"debug", "info", "warn", "error", "dpanic", "panic", "fatal"}
+	isValidLevel := false
+	for _, validLevel := range validLevels {
+		if level == validLevel {
+			isValidLevel = true
+			break
+		}
+	}
+	if !isValidLevel {
+		log.Fatalf("level config not valid: %v", config.Level)
+	}
+
+	// 初始化日志
+	module.InitMyLogger(level)
+	logger := module.GetLogger()
 
 	// 获取db 连接
 	logger.Infof("get db connection....")

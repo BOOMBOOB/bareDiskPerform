@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"log"
 	"runtime"
 )
 
@@ -18,10 +19,16 @@ type MyLogger struct {
 
 var logger *MyLogger
 
-func InitMyLogger() {
+func InitMyLogger(level string) {
+	atomicLevel := zap.NewAtomicLevel()
+	err := atomicLevel.UnmarshalText([]byte(level))
+	if err != nil {
+		log.Fatal("set level failed: ", err)
+	}
+
 	zapLogger, _ := zap.Config{
 		Encoding:         "console",
-		Level:            zap.NewAtomicLevelAt(zapcore.DebugLevel),
+		Level:            atomicLevel,
 		OutputPaths:      []string{"stdout"},
 		ErrorOutputPaths: []string{"stderr"},
 		EncoderConfig: zapcore.EncoderConfig{
