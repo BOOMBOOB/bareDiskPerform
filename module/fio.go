@@ -45,7 +45,7 @@ func ExecuteFio(device string, iotype string, config Config) ([]byte, WorkLoad, 
 	}
 	rampTime := config.RampTime
 	runTime := config.Runtime
-	logger.Infof("iodepth, ramptime, runtime: ", iodepth, rampTime, runTime)
+	logger.Infof("iodepth, ramptime, runtime: %v, %v, %v", iodepth, rampTime, runTime)
 
 	workload := WorkLoad{}
 	workload.BlockSize = bs

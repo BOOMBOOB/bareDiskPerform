@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"runtime"
 )
 
 type MyLogger struct {
@@ -49,25 +50,30 @@ func GetLogger() *MyLogger {
 
 func (l *MyLogger) Infof(format string, args ...interface{}) {
 	message := fmt.Sprintf(format, args...)
-	l.logger.Info(message)
+	pc, file, line, _ := runtime.Caller(1)
+	l.logger.Info(message, zap.String("caller", runtime.FuncForPC(pc).Name()), zap.String("file", file), zap.Int("line", line))
 }
 
 func (l *MyLogger) Debugf(format string, args ...interface{}) {
 	message := fmt.Sprintf(format, args...)
-	l.logger.Debug(message)
+	pc, file, line, _ := runtime.Caller(1)
+	l.logger.Debug(message, zap.String("caller", runtime.FuncForPC(pc).Name()), zap.String("file", file), zap.Int("line", line))
 }
 
 func (l *MyLogger) Warnf(format string, args ...interface{}) {
 	message := fmt.Sprintf(format, args...)
-	l.logger.Warn(message)
+	pc, file, line, _ := runtime.Caller(1)
+	l.logger.Warn(message, zap.String("caller", runtime.FuncForPC(pc).Name()), zap.String("file", file), zap.Int("line", line))
 }
 
 func (l *MyLogger) Errorf(format string, args ...interface{}) {
 	message := fmt.Sprintf(format, args...)
-	l.logger.Error(message)
+	pc, file, line, _ := runtime.Caller(1)
+	l.logger.Error(message, zap.String("caller", runtime.FuncForPC(pc).Name()), zap.String("file", file), zap.Int("line", line))
 }
 
 func (l *MyLogger) Fatalf(format string, args ...interface{}) {
 	message := fmt.Sprintf(format, args...)
-	l.logger.Fatal(message)
+	pc, file, line, _ := runtime.Caller(1)
+	l.logger.Fatal(message, zap.String("caller", runtime.FuncForPC(pc).Name()), zap.String("file", file), zap.Int("line", line))
 }
